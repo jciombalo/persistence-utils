@@ -22,7 +22,7 @@ import java.util.List;
  * </p>
  * <p>
  * Usage example:
- * 
+ * </p>
  * <pre>
  * Repository&lt;Person&gt; repo = ...;
  * Search top10ByAgeAndSkill = SearchBuilder.selectFirst(10)
@@ -32,7 +32,6 @@ import java.util.List;
  *         .build();
  * SearchResult&lt;Person&gt; result = repo.search(top10ByAgeAndSkill);
  * </pre>
- * </p>
  * 
  * @author jorge.ciombalo
  *
@@ -237,10 +236,10 @@ public class SearchBuilder {
 
 	/**
 	 * Creates a new {@link Search} instance with all the criterias previously
-	 * defined. This instance is ready to be submitted to the
-	 * {@link Repository#search}.
+	 * defined. The newly created instance is ready to be submitted to the
+	 * {@link Repository#search} method of a {@link Repository}.
 	 * 
-	 * @return
+	 * @return A new {@link Search} instance with the criterias defined.
 	 */
 	public Search build() {
 		SearchCriteria[] searchCriterias = null;
