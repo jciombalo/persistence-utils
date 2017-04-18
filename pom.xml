@@ -4,7 +4,7 @@
 
 	<groupId>com.jciombalo</groupId>
 	<artifactId>persistence-utils</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<name>JCiombalo :: Persistence Utils</name>
 	
 	<description>Utility classes that aims to help the data access when using JPA only.</description>
