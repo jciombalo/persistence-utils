@@ -22,17 +22,17 @@ import com.jciombalo.utils.persistence.test.entity.Skill;
 
 public class JpaPersistenceTest extends JpaEMInjector {
 	
-	private static final Skill SCIENTIST = new Skill(1, "Scientist");
-	private static final Skill WORLD_LEADER = new Skill(2, "World Leader");
+	private static final Skill scientist = new Skill(1, "Scientist");
+	private static final Skill worldLeader = new Skill(2, "World Leader");
 	
-	private static final Integer MAX_AGE = 100;
-	private static final Person[] INITIAL_PERSONS = {
-			new Person(1, "Charles Darwin", ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1), SCIENTIST),
-			new Person(2, "Albert Einstein", ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1), SCIENTIST),
-			new Person(3, "Mahatma Gandhi", ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1), WORLD_LEADER),
-			new Person(4, "Nelson Mandela", ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1), WORLD_LEADER)
+	private static final Integer maxAge = 100;
+	private static final Person[] initialPersons = {
+			new Person(1, "Charles Darwin", ThreadLocalRandom.current().nextInt(0, maxAge + 1), scientist),
+			new Person(2, "Albert Einstein", ThreadLocalRandom.current().nextInt(0, maxAge + 1), scientist),
+			new Person(3, "Mahatma Gandhi", ThreadLocalRandom.current().nextInt(0, maxAge + 1), worldLeader),
+			new Person(4, "Nelson Mandela", ThreadLocalRandom.current().nextInt(0, maxAge + 1), worldLeader)
 	};
-	private static final String CONTAING_NAME = "AND";
+	private static final String containingName = "AND";
 	
 	private static void assertSamePersonInfo(final Person expected, final Person actual) {
 		Assert.assertNotNull(actual);
@@ -44,7 +44,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
 	}
 	
 	private static void assertOriginalPersonList(final Collection<Person> persons) {
-		List<Person> initialPersons = Arrays.asList(INITIAL_PERSONS);
+		List<Person> initialPersons = Arrays.asList(JpaPersistenceTest.initialPersons);
 		Assert.assertTrue(initialPersons.containsAll(persons));
 		
 		for (Person person : persons) {
@@ -61,9 +61,9 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	em.getTransaction().begin();
     	em.createQuery("Delete from Person p").executeUpdate();
     	em.createQuery("Delete from Skill s").executeUpdate();
-    	em.persist(SCIENTIST);
-    	em.persist(WORLD_LEADER);
-    	for (Person person : INITIAL_PERSONS) {
+    	em.persist(scientist);
+    	em.persist(worldLeader);
+    	for (Person person : initialPersons) {
 			em.persist(person);
 		}
     	em.getTransaction().commit();
@@ -74,8 +74,8 @@ public class JpaPersistenceTest extends JpaEMInjector {
     @Test
     public void givenNewEntity_whenCreating_thenShouldPersistIt() {
     	// given
-		final Person p = new Person(INITIAL_PERSONS.length + 1, "Napoleon Bonaparte",
-				ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1), WORLD_LEADER);
+		final Person p = new Person(initialPersons.length + 1, "Napoleon Bonaparte",
+				ThreadLocalRandom.current().nextInt(0, maxAge + 1), worldLeader);
     	// when
     	em.getTransaction().begin();
     	this.repo.create(p);
@@ -87,7 +87,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     @Test
     public void givenId_whenRetrieving_thenShouldReturnEntity() {
     	// given
-    	final Person person = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person person = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	// when
     	final Person retrieved = this.repo.retrieve(person.getId());
     	// then
@@ -97,8 +97,8 @@ public class JpaPersistenceTest extends JpaEMInjector {
     @Test
     public void givenChangedEntity_whenUpdating_shouldPersistNewInfo() {
     	// given
-    	final Integer newAge = ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1);
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Integer newAge = ThreadLocalRandom.current().nextInt(0, maxAge + 1);
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	p.setAge(newAge);
     	// when
     	em.getTransaction().begin();
@@ -114,7 +114,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     @Test
     public void givenExistingId_whenDeleting_shouldRemoveEntity() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	// when
     	em.getTransaction().begin();
     	this.repo.delete(p.getId());
@@ -129,7 +129,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     @Test
     public void givenExistingEntity_whenDeleting_shouldRemoveIt() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	// when
     	em.getTransaction().begin();
     	this.repo.delete(p);
@@ -138,7 +138,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	@SuppressWarnings("unchecked")
 		final List<Person> remaining = em.createQuery("Select p from Person p").getResultList();
     	Assert.assertFalse(remaining.contains(p));
-    	Assert.assertEquals(INITIAL_PERSONS.length - 1, remaining.size());
+    	Assert.assertEquals(initialPersons.length - 1, remaining.size());
     	assertOriginalPersonList(remaining);
     }
     
@@ -149,8 +149,8 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	// when
     	final SearchResult<Person> result = this.repo.search(noSearchDetails);
     	// then
-    	Assert.assertEquals(INITIAL_PERSONS.length, result.getItemsFound());
-    	assertOriginalPersonList(result.getContent());
+    	Assert.assertEquals(initialPersons.length, result.getItemsFound());
+    	assertOriginalPersonList(result.getData());
     }
     
     @Test
@@ -160,8 +160,8 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	// when
     	final SearchResult<Person> result = this.repo.search(attributeSelection);
     	// then
-    	Assert.assertEquals(INITIAL_PERSONS.length, result.getItemsFound());
-    	for (Person person : result.getContent()) {
+    	Assert.assertEquals(initialPersons.length, result.getItemsFound());
+    	for (Person person : result.getData()) {
 			Assert.assertNotNull(person.getId());
 			Assert.assertNotNull(person.getName());
 			Assert.assertNull(person.getAge());
@@ -172,20 +172,20 @@ public class JpaPersistenceTest extends JpaEMInjector {
     @Test 
     public void givenPageNumberAndSize_whenSearching_shouldPaginateTheResult() {
     	// given
-    	final int pageSize = ThreadLocalRandom.current().nextInt(1, INITIAL_PERSONS.length);
-    	final int lastPageSize = INITIAL_PERSONS.length % pageSize;
-    	final int maxPageNumber = (INITIAL_PERSONS.length / pageSize) + (lastPageSize > 0 ? 1 : 0);
+    	final int pageSize = ThreadLocalRandom.current().nextInt(1, initialPersons.length);
+    	final int lastPageSize = initialPersons.length % pageSize;
+    	final int maxPageNumber = (initialPersons.length / pageSize) + (lastPageSize > 0 ? 1 : 0);
     	final int pageNumber = ThreadLocalRandom.current().nextInt(1, maxPageNumber + 1);
-    	final int expectedPageSize =  pageNumber <= INITIAL_PERSONS.length / pageSize ? pageSize : lastPageSize;
+    	final int expectedPageSize =  pageNumber <= initialPersons.length / pageSize ? pageSize : lastPageSize;
     	
     	// when
     	final Search paginatedSearch = SearchBuilder.selectPage(pageNumber, pageSize).build();
     	final SearchResult<Person> result = this.repo.search(paginatedSearch);
     	// then
-    	Assert.assertEquals(INITIAL_PERSONS.length, result.getItemsFound());
+    	Assert.assertEquals(initialPersons.length, result.getItemsFound());
     	Assert.assertEquals(pageNumber, result.getCurrentPage());
     	Assert.assertEquals(maxPageNumber, result.getPagesFound());
-    	Assert.assertEquals(expectedPageSize, result.getContent().size());
+    	Assert.assertEquals(expectedPageSize, result.getData().size());
     }
    
     @Test
@@ -193,7 +193,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	// given
     	final int maxResults = 1;
     	Person oldestPerson = null;
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (oldestPerson == null || oldestPerson.getAge().compareTo(person.getAge()) < 0) {
 				oldestPerson = person;
 			}
@@ -202,17 +202,17 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final Search topRankedSearch = SearchBuilder.selectFirst(maxResults).sortBy(SortingCriteria.DESC("age")).build();
     	final SearchResult<Person> result = this.repo.search(topRankedSearch);
     	// then
-    	Assert.assertEquals(INITIAL_PERSONS.length, result.getItemsFound());
-    	Assert.assertEquals(maxResults, result.getContent().size());
-    	assertSamePersonInfo(oldestPerson, result.getContent().iterator().next());
+    	Assert.assertEquals(initialPersons.length, result.getItemsFound());
+    	Assert.assertEquals(maxResults, result.getData().size());
+    	assertSamePersonInfo(oldestPerson, result.getData().iterator().next());
     }
     
     @Test 
     public void givenValue_whenSearchingEquals_shouldFindEntitiesExactlyMatching() {
     	// given
-    	final Skill skill = SCIENTIST;
+    	final Skill skill = scientist;
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getSkill().equals(skill)) {
 				expectedResult.add(person);
 			}
@@ -225,15 +225,15 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(skilledPeopleSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test 
     public void givenPartialValue_whenSearchingEquals_shouldFindEntitiesPartialMatching() {
     	// given
-    	final String partialName = CONTAING_NAME;
+    	final String partialName = containingName;
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getName().contains(partialName)) {
 				expectedResult.add(person);
 			}
@@ -247,15 +247,15 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(partialEqualsSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test
     public void givenValue_whenSearchingGreaterOrEqual_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(p.getAge()) >= 0) {
 				expectedResult.add(person);
 			}
@@ -265,16 +265,16 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(greaterOrEqualSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(result.getContent().contains(p));
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(result.getData().contains(p));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test
     public void givenValue_whenSearchingGreater_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(p.getAge()) > 0) {
 				expectedResult.add(person);
 			}
@@ -284,16 +284,16 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(greaterThanSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test
     public void givenListOfValues_whenSearchingIn_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Person p1 = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length / 2)];
-    	final Person p2 = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(INITIAL_PERSONS.length / 2, INITIAL_PERSONS.length)];
+    	final Person p1 = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length / 2)];
+    	final Person p2 = initialPersons[ThreadLocalRandom.current().nextInt(initialPersons.length / 2, initialPersons.length)];
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(p1.getAge()) == 0 || person.getAge().compareTo(p2.getAge()) == 0) {
 				expectedResult.add(person);
 			}
@@ -303,15 +303,15 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(inSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test
     public void givenValue_whenSearchingLowerOrEqual_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(p.getAge()) <= 0) {
 				expectedResult.add(person);
 			}
@@ -321,16 +321,16 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(lowerOrEqualSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(result.getContent().contains(p));
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(result.getData().contains(p));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test
     public void givenValue_whenSearchingLower_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(p.getAge()) < 0) {
 				expectedResult.add(person);
 			}
@@ -340,15 +340,15 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(lowerSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
     @Test
     public void givenValue_whenSearchingNotEquals_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Person p = INITIAL_PERSONS[ThreadLocalRandom.current().nextInt(0, INITIAL_PERSONS.length)];
+    	final Person p = initialPersons[ThreadLocalRandom.current().nextInt(0, initialPersons.length)];
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(p.getAge()) != 0) {
 				expectedResult.add(person);
 			}
@@ -361,17 +361,17 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(negatedSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
-    	Assert.assertFalse(result.getContent().contains(p));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
+    	Assert.assertFalse(result.getData().contains(p));
     }
     
     @Test
     public void givenTwoConditions_whenSearchingBoth_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Skill skill = SCIENTIST;
-    	final Integer minAge = ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1);
+    	final Skill skill = scientist;
+    	final Integer minAge = ThreadLocalRandom.current().nextInt(0, maxAge + 1);
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(minAge) >= 0 && person.getSkill().equals(skill)) {
 				expectedResult.add(person);
 			}
@@ -389,7 +389,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(usualAndSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     	
     	// when (alternative way)
     	final Search alternativeAndSearch = SearchBuilder
@@ -401,17 +401,17 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> alternativeResult = this.repo.search(alternativeAndSearch);
     	// then (alternative way)
     	Assert.assertEquals(expectedResult.size(), alternativeResult.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(alternativeResult.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(alternativeResult.getData()));
     }
     
     @Test
     public void givenTwoConditions_whenSearchingLeastOne_shouldFindEntitiesMatchingTheCondition() {
     	// given
-    	final Skill skill = SCIENTIST;
-    	final Integer maxAge = ThreadLocalRandom.current().nextInt(0, MAX_AGE + 1);
+    	final Skill skill = scientist;
+    	final Integer maxAge = ThreadLocalRandom.current().nextInt(0, JpaPersistenceTest.maxAge + 1);
     	
     	List<Person> expectedResult = new ArrayList<Person>();
-    	for (Person person : INITIAL_PERSONS) {
+    	for (Person person : initialPersons) {
 			if (person.getAge().compareTo(maxAge) < 0 || person.getSkill().equals(skill)) {
 				expectedResult.add(person);
 			}
@@ -427,7 +427,7 @@ public class JpaPersistenceTest extends JpaEMInjector {
     	final SearchResult<Person> result = this.repo.search(orSearch);
     	// then
     	Assert.assertEquals(expectedResult.size(), result.getItemsFound());
-    	Assert.assertTrue(expectedResult.containsAll(result.getContent()));
+    	Assert.assertTrue(expectedResult.containsAll(result.getData()));
     }
     
 }
