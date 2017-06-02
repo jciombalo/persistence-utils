@@ -3,24 +3,36 @@ package com.jciombalo.utils.persistence.search;
 import java.util.Arrays;
 import java.util.List;
 
-import com.jciombalo.utils.persistence.search.typed.TypedPath;
-
 public class SearchBuilder<T> {
 
-	private final Class<T> entityType;
 	private Integer firstResult;
 	private Integer maxResults;
 	private Path[] selectClause;
 	private Condition whereClause;
 	private Sorting[] sortingClause;
 
-	public static <T> SearchBuilder<T> from(Class<T> entityType) {
-		return new SearchBuilder<>(entityType);
+	public static <T> SearchBuilder<T> selectAll() {
+		return new SearchBuilder<T>(null, null, null);
 	}
 
-	public SearchBuilder<T> select(Path... selections) {
-		this.selectClause = selections;
-		return this;
+	public static <T> SearchBuilder<T> selectFirst(Integer firstResult) {
+		return new SearchBuilder<T>(firstResult, null, null);
+	}
+
+	public static <T> SearchBuilder<T> selectMax(Integer maxResults) {
+		return new SearchBuilder<T>(null, maxResults, null);
+	}
+
+	public static <T> SearchBuilder<T> selectPage(Integer firstResult, Integer maxResults) {
+		return new SearchBuilder<T>(firstResult, maxResults, null);
+	}
+
+	public static <T> SearchBuilder<T> select(Path... selections) {
+		return new SearchBuilder<T>(null, null, selections);
+	}
+
+	public static <T> SearchBuilder<T> select(Integer firstResult, Integer maxResults, Path... selections) {
+		return new SearchBuilder<T>(firstResult, maxResults, selections);
 	}
 
 	public SearchBuilder<T> where(Condition c) {
@@ -45,14 +57,11 @@ public class SearchBuilder<T> {
 		return new Search(selections, this.whereClause, sortings, this.firstResult, this.maxResults);
 	}
 
-	public static void main(String[] args) {
-		SearchBuilder.from(Search.class).select(TypedPath.path(Search::getSelections))
-				.where(TypedPath.path(Search::getFromIndex).eq("1").negated())
-				.sort(TypedPath.path(Search::getSelections).asc()).build();
+	protected SearchBuilder(Integer firstResult, Integer maxResults, Path[] selectClause) {
+		super();
+		this.firstResult = firstResult;
+		this.maxResults = maxResults;
+		this.selectClause = selectClause;
 	}
 
-	protected SearchBuilder(Class<T> entityType) {
-		super();
-		this.entityType = entityType;
-	}
 }
