@@ -6,6 +6,7 @@ public enum ConditionType {
 	GE,
 	GT,
 	IN,
+	LIKE,
 	LE,
 	LT,
 	NULL,

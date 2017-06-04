@@ -2,6 +2,8 @@ package com.jciombalo.utils.persistence;
 
 import java.io.Serializable;
 
+import com.jciombalo.utils.persistence.search.Search;
+
 /**
  * Helper interface that encapsulates CRUD operations for a given entity
  * <code>T</code> on a data repository.

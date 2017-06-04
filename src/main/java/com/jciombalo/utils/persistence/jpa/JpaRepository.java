@@ -1,7 +1,6 @@
 package com.jciombalo.utils.persistence.jpa;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,11 +9,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
 
 import com.jciombalo.utils.persistence.Repository;
-import com.jciombalo.utils.persistence.Search;
 import com.jciombalo.utils.persistence.SearchResult;
+import com.jciombalo.utils.persistence.search.Search;
 
 public class JpaRepository<T> implements Repository<T> {
 	
@@ -62,7 +60,8 @@ public class JpaRepository<T> implements Repository<T> {
 		Root<T> fromEntity = criteriaQuery.from(entityType);
 		
 		// Selection Attributes
-		if (searchDetails != null && searchDetails.getAttributes() != null) {
+		/*
+		if (searchDetails != null && searchDetails.getSelections() != null) {
 			List<Selection<?>> selectionList = new ArrayList<>(searchDetails.getAttributes().length);
 			for (String attributeName : searchDetails.getAttributes()) {
 				selectionList.add(fromEntity.get(attributeName));
@@ -70,7 +69,6 @@ public class JpaRepository<T> implements Repository<T> {
 			criteriaQuery.multiselect(selectionList);
 		}
 		
-		Predicate[] restrictions = null;
 		if (searchDetails != null && searchDetails.getSearchCriterias() != null) {
 			restrictions = SearchCriteriaParser.parse(searchDetails.getSearchCriterias(), criteriaBuilder, fromEntity);
 			criteriaQuery.where(restrictions);
@@ -79,17 +77,22 @@ public class JpaRepository<T> implements Repository<T> {
 		if (searchDetails != null && searchDetails.getSortingCriterias() != null) {
 			criteriaQuery.orderBy(SortingCriteriaParser.parse(searchDetails.getSortingCriterias(), criteriaBuilder, fromEntity));
 		}
+		*/
+
+		Predicate[] restrictions = null;
 		
 		TypedQuery<T> query = this.em.createQuery(criteriaQuery);
-		
-		// Apply pagination
-		if (searchDetails != null && searchDetails.getMaxResults() != null) {
-			final long totalItensCount = getItemsCount(restrictions);
-			final int firstResult = (searchDetails.getPageNumber() - 1) * searchDetails.getMaxResults();
-			query.setFirstResult(firstResult);
+		if (searchDetails.getFirstResult() != null) {
+			query.setFirstResult(searchDetails.getFirstResult());
+		}
+		if (searchDetails.getMaxResults() != null) {
 			query.setMaxResults(searchDetails.getMaxResults());
-			return new SearchResult<T>(query.getResultList(), totalItensCount, searchDetails.getMaxResults(),
-					searchDetails.getPageNumber());
+		}
+		List<T> data = query.getResultList();
+		
+		if (searchDetails.getFirstResult() != null || searchDetails.getMaxResults() != null) {
+			final long totalItensCount = getItemsCount(restrictions);
+			return new SearchResult<T>(data, totalItensCount, searchDetails.getMaxResults(), 0l);
 		} else {
 			return new SearchResult<T>(query.getResultList());
 		}

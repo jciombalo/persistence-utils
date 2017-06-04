@@ -7,17 +7,17 @@ public class Search {
 	private final List<Path> selections;
 	private final Condition conditions;
 	private final List<Sorting> sortings;
-	private final Integer fromIndex;
-	private final Integer maxLength;
+	private final Integer firstResult;
+	private final Integer maxResults;
 
 	public Search(List<Path> selections, Condition condition, List<Sorting> sortings,
-			Integer fromIndex, Integer maxLength) {
+			Integer firstResult, Integer maxResults) {
 		super();
 		this.selections = selections;
 		this.conditions = condition;
 		this.sortings = sortings;
-		this.fromIndex = fromIndex;
-		this.maxLength = maxLength;
+		this.firstResult = firstResult;
+		this.maxResults = maxResults;
 	}
 
 	public List<Path> getSelections() {
@@ -32,12 +32,12 @@ public class Search {
 		return sortings;
 	}
 
-	public Integer getFromIndex() {
-		return fromIndex;
+	public Integer getFirstResult() {
+		return firstResult;
 	}
 
-	public Integer getMaxLength() {
-		return maxLength;
+	public Integer getMaxResults() {
+		return maxResults;
 	}
 
 }
